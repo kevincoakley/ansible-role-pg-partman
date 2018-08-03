@@ -1,2 +1,53 @@
 ---
-# tasks file for ansible-role-pg-partman
+- name: Verify postgresql 10 is installed
+  stat:
+    path: /var/lib/pgsql/10/data/PG_VERSION
+  register: pg_version
+  failed_when: pg_version.stat.exists == False
+  changed_when: False
+
+- name: Install postgresql 10 yum repository
+  package:
+    name: "{{ partman_postgresql_10_repo_url }}"
+    state: present
+
+- name: Install pg_partman for postgresql 10
+  package:
+    name: pg_partman10
+    state: present
+
+- name: Get a list of postgresql extension
+  shell: psql -c "SELECT * FROM pg_extension;"
+  args:
+    executable: /bin/bash
+  register: postgresql_plugin_list
+  become: yes
+  become_user: postgres
+  become_method: sudo
+  changed_when: False
+
+- name: Create the pg_partman schema
+  shell: "psql -c \"CREATE SCHEMA {{ partman_schema }};\""
+  args:
+    executable: /bin/bash
+  register: enable_partman
+  become: yes
+  become_user: postgres
+  become_method: sudo
+  failed_when: '"CREATE SCHEMA" not in enable_partman.stdout'
+  changed_when: False
+  when:
+  - '"pg_partman" not in postgresql_plugin_list.stdout'
+
+- name: Enable the pg_partman extension
+  shell: "psql -c \"CREATE EXTENSION pg_partman SCHEMA {{ partman_schema }};\""
+  args:
+    executable: /bin/bash
+  register: enable_partman
+  become: yes
+  become_user: postgres
+  become_method: sudo
+  failed_when: '"CREATE EXTENSION" not in enable_partman.stdout'
+  changed_when: False
+  when:
+  - '"pg_partman" not in postgresql_plugin_list.stdout'
