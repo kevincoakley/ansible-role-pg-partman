@@ -1,7 +1,7 @@
 ---
 - name: Install postgresql 10 yum repository
   package:
-    name: https://download.postgresql.org/pub/repos/yum/10/redhat/rhel-7-x86_64/pgdg-centos10-10-2.noarch.rpm
+    name: "{{ partman_postgresql_10_repo_url }}"
     state: present
 
 - name: Install packages
