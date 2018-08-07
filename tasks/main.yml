@@ -16,6 +16,15 @@
     name: pg_partman10
     state: present
 
+- name: Config for enabling the bgw shared libraries
+  lineinfile:
+    path: /var/lib/pgsql/10/data/postgresql.conf
+    regexp: ^shared_preload_libraries = 'pg_partman_bgw'
+    insertafter: '^# Add settings for extensions here'
+    line: shared_preload_libraries = 'pg_partman_bgw'
+  when: partman_bgw_enabled == true
+  notify: Restart postgresql
+
 - name: Config for pg_partman_bgw.dbname
   lineinfile:
     path: /var/lib/pgsql/10/data/postgresql.conf
