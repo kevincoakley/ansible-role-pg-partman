@@ -1,7 +1,7 @@
 ansible-role-pg-partman
 =======================
 
-[![Build Status](https://travis-ci.org/kevincoakley/ansible-role-pg-partman.svg?branch=master)](https://travis-ci.org/kevincoakley/ansible-role-pg-partman)
+![Molecule Test](https://github.com/kevincoakley/ansible-role-pg-partman/workflows/Molecule%20Test/badge.svg)
 
 Installs the pg_partman partition management extension for PostgreSQL 10 - https://github.com/pgpartman/pg_partman . Tested with pg_partman 3.2.1 on CentOS 7.
 
