@@ -1,0 +1,10 @@
+---
+- name: Prepare
+  hosts: all
+  become: true
+
+  vars:
+    - postgres_major_version: 10
+
+  roles:
+    - role: kevincoakley.postgres

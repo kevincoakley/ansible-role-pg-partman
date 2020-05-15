@@ -1,0 +1,20 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+
+  roles:
+    - role: ansible-role-pg-partman
+
+  post_tasks:
+    - name: Test if the PG_PARTMAN extensions have been enabled
+      shell: psql -c "SELECT * FROM pg_extension;"
+      args:
+        executable: /bin/bash
+      register: postgresql_plugin_list
+      become: true
+      become_user: postgres
+      become_method: sudo
+      changed_when: false
+      failed_when:
+        - '"pg_partman" not in postgresql_plugin_list.stdout'
