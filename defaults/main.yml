@@ -1,5 +1,5 @@
 ---
-partman_postgresql_10_repo_url: https://download.postgresql.org/pub/repos/yum/10/redhat/rhel-7-x86_64/pgdg-centos10-10-2.noarch.rpm
+partman_postgresql_10_repo_url: https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
 partman_schema: partman
 
 partman_bgw_enabled: true
