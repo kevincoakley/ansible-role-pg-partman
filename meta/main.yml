@@ -1,4 +1,6 @@
+---
 galaxy_info:
+  role_name: pg-partman
   author: Kevin Coakley
   description: Installs the pg_partman partition management extension for PostgreSQL 10
 
@@ -21,12 +23,12 @@ galaxy_info:
   # platforms is a list of platforms, and each platform has a name and a list of versions.
   #
   platforms:
-  - name: EL
-    versions:
-    - 7
+    - name: EL
+      versions:
+        - 7
 
   galaxy_tags:
-  - database
-  - postgresql
+    - database
+    - postgresql
 
 dependencies: []

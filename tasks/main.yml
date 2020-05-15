@@ -3,8 +3,8 @@
   stat:
     path: /var/lib/pgsql/10/data/PG_VERSION
   register: pg_version
-  failed_when: pg_version.stat.exists == False
-  changed_when: False
+  failed_when: not pg_version.stat.exists
+  changed_when: false
 
 - name: Install postgresql 10 yum repository
   package:
@@ -21,9 +21,9 @@
   args:
     executable: /bin/bash
   register: shared_preload_libraries_return
-  check_mode: no
-  ignore_errors: yes
-  changed_when: no
+  check_mode: false
+  ignore_errors: true
+  changed_when: false
 
 - name: Add the shared_preload_libraries config for enabling the pg_partman_bgw shared libraries (New Line)
   lineinfile:
@@ -31,10 +31,10 @@
     regexp: ^shared_preload_libraries =
     insertafter: '^# Add settings for extensions here'
     line: shared_preload_libraries = 'pg_partman_bgw'
-    backup: yes
+    backup: true
   when:
     - shared_preload_libraries_return.rc == 1
-    - partman_bgw_enabled == true
+    - partman_bgw_enabled
   notify: Restart postgresql
 
 - name: Update the shared_preload_libraries config for enabling the pg_partman_bgw shared libraries (Existing Line)
@@ -42,11 +42,11 @@
     path: /var/lib/pgsql/10/data/postgresql.conf
     regexp: ^((?=shared_preload_libraries)(?!.*pg_partman_bgw).*\s*=\s*'.*)('.*)
     line: \1, pg_partman_bgw\2
-    backrefs: yes
-    backup: yes
+    backrefs: true
+    backup: true
   when:
     - shared_preload_libraries_return.rc == 0
-    - partman_bgw_enabled == true
+    - partman_bgw_enabled
   notify: Restart postgresql
 
 - name: Config for pg_partman_bgw.dbname
@@ -55,7 +55,7 @@
     regexp: ^pg_partman_bgw.dbname
     insertafter: '^# Add settings for extensions here'
     line: "pg_partman_bgw.dbname  = '{{ partman_bgw_dbname }}'"
-  when: partman_bgw_enabled == true
+  when: partman_bgw_enabled
   notify: Restart postgresql
 
 - name: Config for pg_partman_bgw.interval
@@ -64,7 +64,7 @@
     regexp: ^pg_partman_bgw.interval
     insertafter: '^# Add settings for extensions here'
     line: "pg_partman_bgw.interval  = '{{ partman_bgw_interval }}'"
-  when: partman_bgw_enabled == true
+  when: partman_bgw_enabled
   notify: Restart postgresql
 
 - name: Config for pg_partman_bgw.role
@@ -73,7 +73,7 @@
     regexp: ^pg_partman_bgw.role
     insertafter: '^# Add settings for extensions here'
     line: "pg_partman_bgw.role  = '{{ partman_bgw_role }}'"
-  when: partman_bgw_enabled == true
+  when: partman_bgw_enabled
   notify: Restart postgresql
 
 - name: Config for pg_partman_bgw.analyze
@@ -82,7 +82,7 @@
     regexp: ^pg_partman_bgw.analyze
     insertafter: '^# Add settings for extensions here'
     line: "pg_partman_bgw.analyze  = '{{ partman_bgw_analyze }}'"
-  when: partman_bgw_enabled == true
+  when: partman_bgw_enabled
   notify: Restart postgresql
 
 - name: Config for pg_partman_bgw.jobmon
@@ -91,7 +91,7 @@
     regexp: ^pg_partman_bgw.jobmon
     insertafter: '^# Add settings for extensions here'
     line: "pg_partman_bgw.jobmon  = '{{ partman_bgw_jobmon }}'"
-  when: partman_bgw_enabled == true
+  when: partman_bgw_enabled
   notify: Restart postgresql
 
 - name: Get a list of postgresql extension
@@ -99,33 +99,33 @@
   args:
     executable: /bin/bash
   register: postgresql_plugin_list
-  become: yes
+  become: true
   become_user: postgres
   become_method: sudo
-  changed_when: False
+  changed_when: false
 
 - name: Create the pg_partman schema
   shell: "psql -c \"CREATE SCHEMA {{ partman_schema }};\""
   args:
     executable: /bin/bash
   register: enable_partman
-  become: yes
+  become: true
   become_user: postgres
   become_method: sudo
   failed_when: '"CREATE SCHEMA" not in enable_partman.stdout'
-  changed_when: False
+  changed_when: false
   when:
-  - '"pg_partman" not in postgresql_plugin_list.stdout'
+    - '"pg_partman" not in postgresql_plugin_list.stdout'
 
 - name: Enable the pg_partman extension
   shell: "psql -c \"CREATE EXTENSION pg_partman SCHEMA {{ partman_schema }};\""
   args:
     executable: /bin/bash
   register: enable_partman
-  become: yes
+  become: true
   become_user: postgres
   become_method: sudo
   failed_when: '"CREATE EXTENSION" not in enable_partman.stdout'
-  changed_when: False
+  changed_when: false
   when:
-  - '"pg_partman" not in postgresql_plugin_list.stdout'
+    - '"pg_partman" not in postgresql_plugin_list.stdout'
